@@ -1,38 +1,40 @@
 const fetch = require('node-fetch');
+const fs = require('fs');
+const env  = require("./env");
 
-//https://glass.epos.ubi.pt:8080/GlassFramework/webresources/products/attributes/network
+//var sprintf = require('sprintf-js').sprintf,
+//    vsprintf = require('sprintf-js').vsprintf;
+//     msg=sprintf('%6s\t%5d\t%5d     %.2f  %s', )
 
-const PPPROD='https://glass.epos.ubi.pt:8080/GlassFramework/webresources';
-const PPDEV='http://10.0.7.65:8083/GlassFramework/webresources';
+const current=env.env.PPDEVext;
+console.log(current)
 
-const localhost='http://localhost:8080/GlassFramework/webresources';
-
-const base=PPPROD;
-
-const attribuites="/products/attributes/"
-const stations="/products/"
+var streamBadReqs = fs.createWriteStream("badReqests.txt", {flags:'w'});  
+//a for appending
+streamBadReqs.write("Bad Request Details\n"); 
+streamBadReqs.write( JSON.stringify(current) +"\n"); 
 
 attrQueries =[
-    "network",
-	"analysis_center?type=timeseries",
-    "analysis_center?type=velocities",
-    "reference_frame",
-    "otl_model",
-    "antenna_model",
-    "sampling_period",
-    "format",
-    "network",
-    "analysis_center?type=timeseries",
-    "analysis_center?type=velocities",
-    "reference_frame",
-    "otl_model",
-    "antenna_model",
-    "sampling_period",
-    "format"
+    "/products/attributes/network",
+	"/products/attributes/analysis_center?type=timeseries",
+    "/products/attributes/analysis_center?type=velocities",
+    "/products/attributes/reference_frame",
+    "/products/attributes/otl_model",
+    "/products/attributes/antenna_model",
+    "s/products/attributes/ampling_period",  //missing s
+    "/products/attributes/format",
+    "/products/attributes/network",
+    "/products/attributes/analysis_center?type=timeseries",
+    "/products/attributes/analysis_center?type=velocities",
+    "/products/attributes/reference_frame",
+    "/products/attributes/otl_model",
+    "/products/attributes/antenna_model",
+    "/products/attributes/sampling_period",
+    "/products/attributes/format"
 ]
 
 stnQueries=[
-    "stations", //get all stations
+    "/products/stations", //get all stations
 ]
 
 velQueries=[
@@ -41,7 +43,7 @@ velQueries=[
 ]
 
 async function fetchData( url ) {
-    console.log("Testing " + url);
+    //console.log("Testing " + url);
     try {
 	    response = await fetch(url);
         const data = await response.json();
@@ -54,6 +56,7 @@ async function fetchData( url ) {
     } catch (error) {
 	    console.log("FAILED ")
         console.log(error);
+        streamBadReqs.write( url +"\n"); 
         return null;
     }
     
@@ -65,21 +68,21 @@ async function fetchData( url ) {
     });*/
 }
 
-async function testQueries( type ,queries ) {
+async function testQueries( queries ) {
 
    for (i=0;i<queries.length;i++)
    {
     console.log("<"+queries[i]+">")
-    url=base + type + queries[i];
+    url= current.protocol + "://"+ current.host + current.gf + queries[i];
     const response = await fetchData( url );
   }
 }
 
 async function main() {
 
- await testQueries( attribuites,attrQueries );
+ await testQueries( attrQueries );
 
- await testQueries( stations, stnQueries );
+ await testQueries( stnQueries );
 }
 
 

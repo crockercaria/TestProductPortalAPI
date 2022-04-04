@@ -18,4 +18,9 @@ const localhost = {
     'host':'glass.epos.ubi.pt:8080',
     'gf':'/GlassFramework/webresources'
 }
-const env={ 'PPPROD':PPPROD,'PPPRODext':PPPRODext,'PPPRODint':PPPRODint,'localhost': localhost };
+const env={ 'PPPROD':PPPROD,
+            'PPDEVext':PPDEVext,
+            'PPDEVint':PPDEVint,
+            'localhost': localhost };
+
+module.exports = { env };
